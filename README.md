@@ -1,4 +1,8 @@
-# Build Automation with Packer
+## Building the Mailcoach 1-click-installer
+
+This repo contains the Packer configuration used to build the snapshot behind [our 1-click-installer](https://mailcoach.app/docs/v2/app/installation/using-the-1-click-installer).
+
+## Using Packer
 
 [Packer](https://www.packer.io/intro/index.html) is a tool for creating images from a single source configuration. Using this Packer template reduces the entire process of creating, configuring, validating, and snapshotting a build Droplet to a single command:
 
