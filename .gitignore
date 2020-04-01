@@ -1,0 +1,5 @@
+files/var/www/mailcoach/*
+!files/var/www/mailcoach/.gitkeep
+.env
+image.tar
+*.pem

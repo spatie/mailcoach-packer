@@ -1,0 +1,48 @@
+---
+# tasks file for web
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: latest
+
+- name: Instal PHP-FPM
+  apt:
+    name: ['php7.4','php7.4-fpm', 'php7.4-mysql','php7.4-common','php7.4-cli','php7.4-curl', 'php7.4-simplexml', 'php7.4-mbstring', 'php7.4-zip', 'php7.4-imagick', 'php7.4-redis', 'php7.4-gd']
+    state: latest
+
+- name: Configure php.ini
+  blockinfile:
+    dest: /etc/php/{{ php_version }}/fpm/php.ini
+    block: |
+      cgi-fix_pathinfo = 0
+    backup: yes
+  notify: restart php-fpm
+
+- name: Set max upload size
+  become: yes
+  ini_file:
+    path: /etc/php/{{ php_version }}/fpm/php.ini
+    section: PHP
+    option: upload_max_filesize
+    value: 10M
+  notify: restart php-fpm
+
+- name: Set max post size
+  become: yes
+  ini_file:
+    path: /etc/php/{{ php_version }}/fpm/php.ini
+    section: PHP
+    option: post_max_size
+    value: 20M
+  notify: restart php-fpm
+
+- name: install composer
+  get_url: url=https://getcomposer.org/installer dest=/tmp/composer-setup.php
+
+- name: install composer globally
+  command: php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+- name: Configure Horizon Supervisor
+  supervisorctl:
+    name: horizon
+    state: present

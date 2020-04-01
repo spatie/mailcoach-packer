@@ -1,0 +1,37 @@
+---
+# tasks file for common
+- name: Create Swap file
+  shell: |
+    fallocate -l 1G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
+
+- name: Add PHP Repository
+  apt_repository:
+    repo: ppa:ondrej/php
+    state: present
+    update_cache: no
+    
+- name: Add Nginx Repository
+  apt_repository:
+    repo: ppa:ondrej/nginx
+    state: present
+    update_cache: no
+
+- name: Add Certbot Repository
+  apt_repository:
+    repo: ppa:certbot/certbot
+    state: present
+    update_cache: no
+
+- name: Update repository and Upgrade packages
+  apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: Install Packages
+  apt:
+    name: ['expect','supervisor','certbot','python-certbot-nginx','zip','unzip']
+    state: latest

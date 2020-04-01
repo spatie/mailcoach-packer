@@ -1,0 +1,159 @@
+#!/bin/bash
+#
+# Mailcoach activation script
+#
+# This script will configure Apache with the domain
+# provided by the user and offer the option to set up
+# LetsEncrypt as well.
+
+# Enable Mailcoach on firstlogin
+echo "This script will copy the Mailcoach installation into"
+echo "your web root and move the existing one to /var/www/html.old"
+echo "--------------------------------------------------"
+echo "This setup requires a domain name and a license key."
+echo "If you do not have one yet, you may cancel this setup, press Ctrl+C."
+echo "This script will run again on your next login"
+echo "--------------------------------------------------"
+echo "Enter the domain name for your new Mailcoach site."
+echo "(ex. example.org or test.example.org) do not include www or http/s"
+echo "--------------------------------------------------"
+a=0
+while [ $a -eq 0 ]
+do
+ read -p "Domain/Subdomain name: " dom
+ if [ -z "$dom" ]
+ then
+  a=0
+  echo "Please provide a valid domain or subdomain name to continue or press Ctrl+C to cancel"
+ else
+  a=1
+fi
+done
+
+# Set some default zero values
+license=""
+validLicense=""
+email="0"
+username="0"
+pass="0"
+
+echo -en "Enter your license key for Mailcoach."
+
+while [[ $license == "" && $validLicense == "" ]]
+do
+ echo -en "\n"
+ read -p "Your License key: " license
+
+ if [ -z "$license" ]
+ then
+  validLicense=""
+  echo "Please provide a valid license to continue or press Ctrl+C to cancel"
+ else
+  response=$(curl --write-out %{http_code} --silent --output /dev/null "https://mailcoach.app/is-valid-license/$license")
+  if [ $response == "200" ]
+  then
+   validLicense="true"
+  else
+   echo "Please provide a valid license to continue or press Ctrl+C to cancel"
+   validLicense=""
+   license=""
+  fi
+ fi
+done
+
+sed -i "s/\$domain/$dom/g"  /etc/nginx/nginx.conf
+
+echo -en "\n\n"
+echo "Next, you have the option of configuring LetsEncrypt to secure your new site."
+echo "Before doing this, be sure that you have pointed your domain or subdomain to this server's IP address."
+echo "You can also run LetsEncrypt certbot later with the command 'certbot --nginx'"
+echo "--------------------------------------------------"
+echo -en "\n\n"
+
+validYn="0"
+while [ $validYn == "0" ]
+do
+  read -p "Would you like to use LetsEncrypt (certbot) to configure SSL(https) for your new site? (y/n): " yn
+      case $yn in
+          [Yy]* ) certbot --nginx; echo "Mailcoach has been enabled at https://$dom.";validYn=1;break;;
+          [Nn]* ) echo "Skipping LetsEncrypt certificate generation";validYn=1;break;;
+          * ) echo "Please answer y or n.";;
+      esac
+done
+
+echo -en "Please provide the credentials for your admin user of Mailcoach."
+while [ $email == "0" ]
+do
+ echo -en "\n"
+ read -p "Email Address: " email
+done
+while [ $username == "0" ]
+do
+ echo -en "\n"
+ read -p  "Name: " username
+done
+
+while [ $pass == "0" ]
+do
+  echo -en "\n"
+  read -s -p "Password: " pass
+done
+
+echo "Finalizing installation..."
+
+echo -en "Completing the configuration for Mailcoach..."
+echo -en "\n\n"
+echo -en "Setting composer auth."
+export COMPOSER_ALLOW_SUPERUSER=1
+composer config http-basic.satis.mailcoach.app user $license --global --quiet
+
+if [ ! -f "/var/www/mailcoach/composer.json" ]; then
+  echo -en "Installing Mailcoach..."
+  echo -en "\n\n"
+  composer create-project spatie/mailcoach /var/www/mailcoach --no-dev --no-progress --prefer-dist --repository=https://satis.mailcoach.app
+else
+  echo -en "Project already created. Skipping."
+  echo -en "\n\n"
+fi
+
+cd /var/www/mailcoach
+
+echo -en "Setting env files..."
+echo -en "\n\n"
+export $(cat /root/.digitalocean_password | xargs)
+
+# populate the Mailcoach .env file
+sed -e "s/DB_USERNAME=root/DB_USERNAME=mailcoach/g" \
+    -e "s/DB_PASSWORD=/DB_PASSWORD=\"${mailcoach_mysql_pass}\"/g" \
+    -e "s/APP_URL=.*/APP_URL=\"https:\/\/${dom}\"/g" \
+    -i .env
+
+chown -Rf www-data:www-data /var/www/mailcoach
+
+echo -en "Migrating database..."
+echo -en "\n\n"
+php artisan migrate --force
+
+echo -en "Creating user..."
+echo -en "\n\n"
+php artisan make:user --username="$username" --email="$email" --password="$pass"
+
+echo -en "Moving files..."
+echo -en "\n\n"
+mv /var/www/html /var/www/html.old
+mv /var/www/mailcoach /var/www/html
+chown -Rf www-data:www-data /var/www/html
+composer link-mailcoach-assets
+cd /var/www/html
+php artisan storage:link
+
+service nginx restart
+
+echo -en "Starting Horizon..."
+echo -en "\n\n"
+supervisorctl restart horizon
+
+chown -Rf www-data.www-data /var/www/
+cp /etc/skel/.bashrc /root
+source /root/.bashrc
+echo "Installation complete. Access your new Mailcoach site in a browser to continue. Database credentials can be found in /root/.digitalocean_password"

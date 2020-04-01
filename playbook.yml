@@ -1,0 +1,8 @@
+---
+- hosts: default
+  become: yes
+  roles:
+    - jnv.unattended-upgrades
+    - ansible/common
+    - ansible/web
+    - ansible/db

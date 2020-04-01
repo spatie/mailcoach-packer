@@ -1,0 +1,26 @@
+---
+# tasks file for db
+- name: Install MySQL & Redis
+  apt:
+    name: ['redis-server', 'mysql-server','mysql-client','python3-mysqldb','libmysqlclient-dev']
+    state: latest
+  notify: restart mysql
+
+- name: Start Redis
+  service:
+    name=redis-server
+    state=started
+    enabled=yes
+
+- name: Create database
+  mysql_db:
+    name: '{{ db_name }}'
+    state: present
+
+- name: Create user for the database
+  mysql_user:
+    name: '{{ db_user }}'
+    password: '{{ db_pass }}'
+    encrypted: yes
+    priv: '{{ db_name }}.*:ALL'
+    state: present

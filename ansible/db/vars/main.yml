@@ -1,0 +1,5 @@
+---
+# vars file for db
+db_name: mailcoach
+db_user: mailcoach
+db_pass: '*E3909E16CBD604B42E234483C1FABFCB34C60FB3' # mailcoach
