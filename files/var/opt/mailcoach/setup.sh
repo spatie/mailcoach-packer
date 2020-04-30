@@ -21,12 +21,13 @@ a=0
 while [ $a -eq 0 ]
 do
  read -p "Domain/Subdomain name: " dom
- if [ -z "$dom" ]
+ host $dom 2>&1 > /dev/null
+ if [ $? -eq 0 ]
  then
-  a=0
-  echo "Please provide a valid domain or subdomain name to continue or press Ctrl+C to cancel"
- else
   a=1
+ else
+  a=0
+  echo "Please provide a valid domain or subdomain name that resolves to an ip to continue or press Ctrl+C to cancel"
 fi
 done
 
