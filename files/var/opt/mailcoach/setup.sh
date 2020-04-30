@@ -75,8 +75,20 @@ while [ $validYn == "0" ]
 do
   read -p "Would you like to use LetsEncrypt (certbot) to configure SSL(https) for your new site? (y/n): " yn
       case $yn in
-          [Yy]* ) certbot --nginx; echo "Mailcoach has been enabled at https://$dom.";validYn=1;break;;
-          [Nn]* ) echo "Skipping LetsEncrypt certificate generation";validYn=1;break;;
+          [Yy]* )
+            if certbot --nginx
+            then
+              echo "Mailcoach has been enabled at https://$dom.";
+              validYn=1;
+            else
+              echo -en "ERROR: Something went wrong during certbot validation, check the error above."
+              exit 1 # Error
+            fi
+            break;;
+          [Nn]* )
+            echo "Skipping LetsEncrypt certificate generation";
+            validYn=1;
+            break;;
           * ) echo "Please answer y or n.";;
       esac
 done
@@ -110,7 +122,14 @@ composer config http-basic.satis.mailcoach.app user $license --global --quiet
 if [ ! -f "/var/www/mailcoach/composer.json" ]; then
   echo -en "Installing Mailcoach..."
   echo -en "\n\n"
-  composer create-project spatie/mailcoach /var/www/mailcoach --no-dev --no-progress --prefer-dist --repository=https://satis.mailcoach.app
+  if composer create-project spatie/mailcoach /var/www/mailcoach --no-dev --no-progress --prefer-dist --repository=https://satis.mailcoach.app
+  then
+    echo -en "Mailcoach installed."
+    echo -en "\n\n"
+  else
+    echo -en "ERROR: Something went wrong during composer."
+    exit 1 # Error
+  fi
 else
   echo -en "Project already created. Skipping."
   echo -en "\n\n"
@@ -132,18 +151,38 @@ chown -Rf www-data:www-data /var/www/mailcoach
 
 echo -en "Migrating database..."
 echo -en "\n\n"
-php artisan migrate --force
+if php artisan migrate --force
+then
+  echo -en "Migrated database"
+  echo -en "\n\n"
+else
+  echo -en "ERROR: Something went wrong during migration, check the error above."
+  exit 1 # Error
+fi
 
 echo -en "Creating user..."
 echo -en "\n\n"
-php artisan make:user --username="$username" --email="$email" --password="$pass"
+if php artisan make:user --username="$username" --email="$email" --password="$pass"
+then
+  echo -en "User created"
+  echo -en "\n\n"
+else
+  echo -en "ERROR: Something went wrong during user creation, check the error above."
+  exit 1 # Error
+fi
 
-echo -en "Moving files..."
-echo -en "\n\n"
-mv /var/www/html /var/www/html.old
-mv /var/www/mailcoach /var/www/html
-chown -Rf www-data:www-data /var/www/html
-composer link-mailcoach-assets
+if [ ! -f "/var/www/html/composer.json" ]; then
+  echo -en "Moving files..."
+  echo -en "\n\n"
+  mv /var/www/html /var/www/html.old
+  mv /var/www/mailcoach /var/www/html
+  chown -Rf www-data:www-data /var/www/html
+  composer link-mailcoach-assets
+else
+  echo -en "Files already moved. Skipping."
+  echo -en "\n\n"
+fi
+
 cd /var/www/html
 php artisan storage:link
 
@@ -151,6 +190,7 @@ service nginx restart
 
 echo -en "Starting Horizon..."
 echo -en "\n\n"
+redis-cli config set stop-writes-on-bgsave-error no >> /dev/null
 supervisorctl restart horizon
 
 chown -Rf www-data.www-data /var/www/
