@@ -2,6 +2,16 @@
 
 This repo contains the Packer configuration used to build the snapshot behind [our 1-click-installer](https://mailcoach.app/docs/v2/app/installation/using-the-1-click-installer) containing a fully configured [Mailcoach](https://mailcoach.app) installation.
 
+## Support us
+
+Learn how to create a package like this one, by watching our premium video course:
+
+[![Laravel Package training](https://spatie.be/github/package-training.jpg)](https://laravelpackage.training)
+
+We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+
+We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+
 ## Using Packer
 
 [Packer](https://www.packer.io/intro/index.html) is a tool for creating images from a single source configuration. Using this Packer template reduces the entire process of creating, configuring, validating, and snapshotting a build Droplet to a single command:
@@ -26,4 +36,3 @@ This template uses Packer's [file provisioner](https://www.packer.io/docs/provis
 This template also uses Packer's [shell provisioner](https://www.packer.io/docs/provisioners/shell.html) to run scripts from the `/scripts` directory and install APT packages using an inline task.
 
 Learn more about using Packer in [the official Packer documentation](https://www.packer.io/docs/index.html).
-
