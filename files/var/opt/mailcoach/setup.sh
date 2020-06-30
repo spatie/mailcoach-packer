@@ -184,6 +184,10 @@ else
   echo -en "\n\n"
 fi
 
+chmod +x /var/www/html/artisan
+mkdir -p /var/log/mailcoach
+rm -rf ~/~rias
+
 cd /var/www/html
 php artisan storage:link
 
