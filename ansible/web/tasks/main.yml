@@ -12,7 +12,7 @@
 
 - name: Configure php.ini
   blockinfile:
-    dest: /etc/php/{{ php_version }}/fpm/php.ini
+    dest: /etc/php/7.4/fpm/php.ini
     block: |
       cgi-fix_pathinfo = 0
     backup: yes
@@ -21,7 +21,7 @@
 - name: Set max upload size
   become: yes
   ini_file:
-    path: /etc/php/{{ php_version }}/fpm/php.ini
+    path: /etc/php/7.4/fpm/php.ini
     section: PHP
     option: upload_max_filesize
     value: 10M
@@ -30,7 +30,7 @@
 - name: Set max post size
   become: yes
   ini_file:
-    path: /etc/php/{{ php_version }}/fpm/php.ini
+    path: /etc/php/7.4/fpm/php.ini
     section: PHP
     option: post_max_size
     value: 20M
