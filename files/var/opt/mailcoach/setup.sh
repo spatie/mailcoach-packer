@@ -118,7 +118,7 @@ echo -en "Completing the configuration for Mailcoach..."
 echo -en "\n\n"
 echo -en "Setting composer auth."
 export COMPOSER_ALLOW_SUPERUSER=1
-composer config http-basic.satis.mailcoach.app user $license --global --quiet
+composer config http-basic.satis.spatie.be user $license --global --quiet
 
 if [ ! -f "/var/www/mailcoach/composer.json" ]; then
   echo -en "Installing Mailcoach..."
@@ -146,6 +146,8 @@ export $(cat /root/.digitalocean_password | xargs)
 sed -e "s/DB_USERNAME=root/DB_USERNAME=mailcoach/g" \
     -e "s/DB_PASSWORD=/DB_PASSWORD=\"${mailcoach_mysql_pass}\"/g" \
     -e "s/APP_URL=.*/APP_URL=\"https:\/\/${dom}\"/g" \
+    -e "s/APP_ENV=local.*/APP_ENV=production/g" \
+    -e "s/DEBUG=true.*/DEBUG=false/g" \
     -i .env
 
 chown -Rf www-data:www-data /var/www/mailcoach
@@ -163,7 +165,7 @@ fi
 
 echo -en "Creating user..."
 echo -en "\n\n"
-if php artisan make:user --username="$username" --email="$email" --password="$pass"
+if php artisan mailcoach:make-user --username="$username" --email="$email" --password="$pass"
 then
   echo -en "User created"
   echo -en "\n\n"
@@ -178,7 +180,6 @@ if [ ! -f "/var/www/html/composer.json" ]; then
   mv /var/www/html /var/www/html.old
   mv /var/www/mailcoach /var/www/html
   chown -Rf www-data:www-data /var/www/html
-  composer link-mailcoach-assets
 else
   echo -en "Files already moved. Skipping."
   echo -en "\n\n"
@@ -198,6 +199,7 @@ echo -en "\n\n"
 redis-cli config set stop-writes-on-bgsave-error no >> /dev/null
 supervisorctl restart horizon
 
+mkdir -p /var/www/html/storage/framework/cache
 chown -Rf www-data.www-data /var/www/
 cp /etc/skel/.bashrc /root
 source /root/.bashrc
