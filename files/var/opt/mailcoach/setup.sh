@@ -123,7 +123,7 @@ composer config http-basic.satis.spatie.be user $license --global --quiet
 if [ ! -f "/var/www/mailcoach/composer.json" ]; then
   echo -en "Installing Mailcoach..."
   echo -en "\n\n"
-  if composer create-project spatie/mailcoach /var/www/mailcoach --no-dev --no-progress --prefer-dist --repository=https://satis.mailcoach.app
+  if composer create-project spatie/mailcoach /var/www/mailcoach --no-dev --no-progress --prefer-dist --repository=https://satis.spatie.be
   then
     echo -en "Mailcoach installed."
     echo -en "\n\n"
@@ -201,6 +201,8 @@ supervisorctl restart horizon
 
 mkdir -p /var/www/html/storage/framework/cache
 chown -Rf www-data.www-data /var/www/
+php artisan cache:clear
+
 cp /etc/skel/.bashrc /root
 source /root/.bashrc
 echo "Installation complete. Access your new Mailcoach site in a browser to continue. Database credentials can be found in /root/.digitalocean_password"
