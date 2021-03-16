@@ -13,14 +13,13 @@
     enabled=yes
 
 - name: Create database
-  mysql_db:
+  community.mysql.mysql_db:
     name: '{{ db_name }}'
     state: present
 
 - name: Create user for the database
-  mysql_user:
+  community.mysql.mysql_user:
     name: '{{ db_user }}'
     password: '{{ db_pass }}'
-    encrypted: yes
     priv: '{{ db_name }}.*:ALL'
     state: present

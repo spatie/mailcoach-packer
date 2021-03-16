@@ -20,12 +20,6 @@
     state: present
     update_cache: no
 
-- name: Add Certbot Repository
-  apt_repository:
-    repo: ppa:certbot/certbot
-    state: present
-    update_cache: no
-
 - name: Update repository and Upgrade packages
   apt:
     upgrade: dist
@@ -33,5 +27,5 @@
 
 - name: Install Packages
   apt:
-    name: ['expect','supervisor','certbot','python-certbot-nginx','zip','unzip']
+    name: ['expect','supervisor','certbot','python3-certbot-nginx','zip','unzip']
     state: latest

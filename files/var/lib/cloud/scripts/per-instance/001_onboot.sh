@@ -7,8 +7,8 @@ debian_sys_maint_mysql_pass=$(openssl rand -hex 24)
 
 # Don't enable Mailcoach until first login
 cat >> /root/.bashrc <<EOM
-chmod +x /var/opt/mailcoach/setup.sh
-/var/opt/mailcoach/setup.sh
+chmod +x /opt/mailcoach/setup.sh
+/opt/mailcoach/setup.sh
 EOM
 
 # Save the passwords
@@ -69,4 +69,3 @@ user     = debian-sys-maint
 password = ${debian_sys_maint_mysql_pass}
 socket   = /var/run/mysqld/mysqld.sock
 EOM
-

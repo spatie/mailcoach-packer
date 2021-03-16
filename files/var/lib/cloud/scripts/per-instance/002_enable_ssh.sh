@@ -6,3 +6,4 @@ sed -e '/Match User root/d' \
     -i /etc/ssh/sshd_config
 
 systemctl restart ssh
+systemctl restart nginx

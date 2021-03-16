@@ -4,15 +4,16 @@
   apt:
     name: nginx
     state: latest
+  notify: restart nginx
 
 - name: Install PHP-FPM
   apt:
-    name: ['php7.4','php7.4-fpm', 'php7.4-mysql','php7.4-common','php7.4-cli','php7.4-curl', 'php7.4-simplexml', 'php7.4-mbstring', 'php7.4-zip', 'php7.4-imagick', 'php7.4-redis', 'php7.4-gd']
+    name: ['php8.0','php8.0-fpm', 'php8.0-mysql','php8.0-common','php8.0-cli','php8.0-curl', 'php8.0-simplexml', 'php8.0-mbstring', 'php8.0-zip', 'php8.0-imagick', 'php8.0-redis', 'php8.0-gd']
     state: latest
 
 - name: Configure php.ini
   blockinfile:
-    dest: /etc/php/7.4/fpm/php.ini
+    dest: /etc/php/8.0/fpm/php.ini
     block: |
       cgi-fix_pathinfo = 0
     backup: yes
@@ -21,7 +22,7 @@
 - name: Set max upload size
   become: yes
   ini_file:
-    path: /etc/php/7.4/fpm/php.ini
+    path: /etc/php/8.0/fpm/php.ini
     section: PHP
     option: upload_max_filesize
     value: 10M
@@ -30,7 +31,7 @@
 - name: Set max post size
   become: yes
   ini_file:
-    path: /etc/php/7.4/fpm/php.ini
+    path: /etc/php/8.0/fpm/php.ini
     section: PHP
     option: post_max_size
     value: 20M

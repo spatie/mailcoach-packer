@@ -8,6 +8,6 @@
 
 - name: restart php-fpm
   service:
-    name: php7.4-fpm
+    name: php8.0-fpm
     state: restarted
     enabled: yes
