@@ -50,7 +50,7 @@ do
   validLicense=""
   echo "Please provide a valid license to continue or press Ctrl+C to cancel"
  else
-  response=$(curl --write-out %{http_code} --silent --output /dev/null "https://mailcoach.app/is-valid-license/$license")
+  response=$(curl --write-out %{http_code} --silent --output /dev/null "https://spatie.be/is-valid-license/$license")
   if [ $response == "200" ]
   then
    validLicense="true"
