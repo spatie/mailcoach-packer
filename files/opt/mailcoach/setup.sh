@@ -123,7 +123,7 @@ composer config http-basic.satis.spatie.be user $license --global --quiet
 if [ ! -f "/var/www/mailcoach/composer.json" ]; then
   echo -en "Installing Mailcoach..."
   echo -en "\n\n"
-  if composer create-project spatie/mailcoach:dev-main /var/www/mailcoach --no-dev --no-progress --prefer-dist --repository=https://satis.spatie.be
+  if composer create-project spatie/mailcoach /var/www/mailcoach --no-dev --no-progress --prefer-dist --repository=https://satis.spatie.be
   then
     echo -en "Mailcoach installed."
     echo -en "\n\n"

@@ -16,7 +16,7 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 
 ```
 ansible-galaxy install jnv.unattended-upgrades
-packer build mailcoach-one-click.json
+packer build -var 'do_api_token=YOUR_TOKEN' template.json
 ```
 
 ## Usage
