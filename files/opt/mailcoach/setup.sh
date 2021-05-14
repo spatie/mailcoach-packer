@@ -95,18 +95,18 @@ do
 done
 
 echo -en "Please provide the credentials for your admin user of Mailcoach."
-while [ $email == "0" ]
+while [ "$email" == 0 ]
 do
  echo -en "\n"
  read -p "Email Address: " email
 done
-while [ $username == "0" ]
+while [ "$username" == 0 ]
 do
  echo -en "\n"
  read -p  "Name: " username
 done
 
-while [ $pass == "0" ]
+while [ "$pass" == 0 ]
 do
   echo -en "\n"
   read -s -p "Password: " pass
@@ -202,6 +202,7 @@ supervisorctl restart horizon
 mkdir -p /var/www/html/storage/framework/cache
 chown -Rf www-data.www-data /var/www/
 php artisan cache:clear
+rm -rf /var/www/html/storage/framework/cache/*
 
 cp /etc/skel/.bashrc /root
 source /root/.bashrc
