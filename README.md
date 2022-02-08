@@ -1,3 +1,5 @@
+**THE ONE CLICK INSTALLER HAS BEEN DISCONTINUED**
+
 ## Building the Mailcoach 1-click-installer
 
 This repo contains the Packer configuration used to build the snapshot behind [our 1-click-installer](https://mailcoach.app/docs/v2/app/installation/using-the-1-click-installer) containing a fully configured [Mailcoach](https://mailcoach.app) installation.
